@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Air Quality</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#4CAF50">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Air Quality Monitor</h1>
+    <div id="aqi-value">--</div>
+    <div id="status">Loading...</div>
+    <div id="details">
+      <p>CO: <span id="co-value">--</span> ppm</p>
+      <p>CO2: <span id="co2-value">--</span> ppm</p>
+      <p>Smoke: <span id="smoke-value">--</span> ppm</p>
+    </div>
+    <button id="install-btn">Install Widget</button>
+    <div id="setup-instructions" class="hidden">
+      <h2>Setup Instructions</h2>
+      <p>To enable the floating AQI widget, you need to install the AQI Widget app:</p>
+      <ol>
+        <li>Download the app: <a href="/AQIWidget.apk" download>Download AQI Widget</a></li>
+        <li>Open the downloaded file to install the app. You may need to enable "Install from unknown sources" in your settings.</li>
+        <li>Return to this page and click "Install Widget" again.</li>
+      </ol>
+    </div>
+  </div>
+  <script src="/app.js"></script>
+</body>
+</html>
