@@ -1,32 +1,101 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Air Quality</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#4CAF50">
-  <link rel="stylesheet" href="/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Air Quality Monitor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+            background-color: #f0f0f0;
+        }
+        #aqiDisplay {
+            font-size: 2em;
+            color: #333;
+            margin: 20px;
+        }
+        .category {
+            font-size: 1.5em;
+            color: #2e7d32; /* Green for good/moderate conditions */
+        }
+        .gas-readings {
+            font-size: 1.2em;
+            margin: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .hidden {
+            display: none;
+        }
+        /* Conditional coloring based on category (optional enhancement) */
+        .category.unhealthy { color: #d32f2f; } /* Red for unhealthy */
+        .category.very-unhealthy { color: #c2185b; } /* Purple for very unhealthy */
+    </style>
 </head>
 <body>
-  <div class="container">
     <h1>Air Quality Monitor</h1>
-    <div id="aqi-value">--</div>
-    <div id="status">Loading...</div>
-    <div id="details">
-      <p>CO: <span id="co-value">--</span> ppm</p>
-      <p>CO2: <span id="co2-value">--</span> ppm</p>
-      <p>Smoke: <span id="smoke-value">--</span> ppm</p>
-    </div>
-    <button id="install-btn">Install Widget</button>
-    <div id="setup-instructions" class="hidden">
-      <h2>Setup Instructions</h2>
-      <p>To enable the floating AQI widget, you need to install the AQI Widget app:</p>
-      <ol>
-        <li>Download the app: <a href="/AQIWidget.apk" download>Download AQI Widget</a></li>
-        <li>Open the downloaded file to install the app. You may need to enable "Install from unknown sources" in your settings.</li>
-        <li>Return to this page and click "Install Widget" again.</li>
-      </ol>
-    </div>
-  </div>
-  <script src="/app.js"></script>
+    <div id="aqiDisplay">AQI: <span id="aqiValue">Loading...</span></div>
+    <div class="category" id="category">Category: Loading...</div>
+    <div class="gas-readings" id="gasReadings">Loading gas data...</div>
+    <button id="installWidgetBtn">Install Widget</button>
+    <p id="installMessage" class="hidden"></p>
+
+    <script>
+        // Function to fetch and update AQI data
+        function updateAQI() {
+            fetch('/aqi')
+                .then(response => response.text())
+                .then(data => {
+                    const [aqiPart, gasPart] = data.split(' | ');
+                    const aqiMatch = aqiPart.match(/AQI: (\d+) - (.+)/);
+                    if (aqiMatch) {
+                        const aqiValue = aqiMatch[1];
+                        const category = aqiMatch[2].toLowerCase();
+                        document.getElementById('aqiValue').textContent = aqiValue;
+                        const categoryElement = document.getElementById('category');
+                        categoryElement.textContent = 'Category: ' + aqiMatch[2];
+                        // Apply conditional styling based on category
+                        categoryElement.className = 'category ' + category.replace(/ /g, '-');
+                    }
+                    document.getElementById('gasReadings').textContent = gasPart || 'No gas data';
+                })
+                .catch(error => {
+                    console.error('Error fetching AQI:', error);
+                    document.getElementById('aqiValue').textContent = 'Error';
+                    document.getElementById('category').textContent = 'Category: Error';
+                    document.getElementById('category').className = 'category';
+                    document.getElementById('gasReadings').textContent = 'Failed to load gas data';
+                });
+        }
+
+        // Update AQI every 5 seconds
+        setInterval(updateAQI, 5000);
+        updateAQI(); // Initial call
+
+        // Handle widget installation
+        document.getElementById('installWidgetBtn').addEventListener('click', () => {
+            if (/Android/.test(navigator.userAgent)) {
+                const apkUrl = 'https://github.com/Raas21/AQMS/AQI_WebApp/widget.apk'; 
+                window.location.href = apkUrl;
+                document.getElementById('installMessage').textContent = 'Downloading Widget APK...';
+                document.getElementById('installMessage').classList.remove('hidden');
+            } else {
+                document.getElementById('installMessage').textContent = 'Widget available for Android only.';
+                document.getElementById('installMessage').classList.remove('hidden');
+            }
+        });
+    </script>
 </body>
 </html>
