@@ -10,8 +10,8 @@ const int MQ7_PIN = 35;   // Analog pin for CO detection
 const int MQ135_PIN = 32; // Analog pin for CO2 detection
 
 // Wi-Fi and server setup
-const char* ssid = "AirQualityMonitor";
-const char* password = "password123";
+const char* ssid = "Your actual ssid"; //placeholder for ssid
+const char* password = "your actual password"; //placeholder for password
 
 AsyncWebServer server(80);
 DNSServer dnsServer;
@@ -42,7 +42,7 @@ float calculateAQI(float co_ppm, float smoke_ppm) {
   // Smoke approximated as PM2.5 (simplified, refine with actual PM sensor)
   if (smoke_ppm <= 35.4) return (smoke_ppm / 35.4) * 100;
   else if (smoke_ppm <= 55.4) return 101 + ((smoke_ppm - 35.5) / 19.9) * 49;
-  else return 151; // Placeholder, adjust with full PM2.5 breakpoints
+  else return 151; 
 }
 
 String getAQICategory(int aqi) {
@@ -84,7 +84,7 @@ void setup() {
     float mq7_ratio = readMQSensor(MQ7_PIN, MQ7_Ro);
     float mq135_ratio = readMQSensor(MQ135_PIN, MQ135_Ro);
 
-    // Approximate ppm based on sensitivity curves (adjust with datasheet)
+    // Approximate ppm based on sensitivity curves
     float co_ppm = 20.0 / mq7_ratio;    // MQ7 CO calibration
     float smoke_ppm = 50.0 / mq2_ratio; // MQ2 smoke calibration
     float co2_ppm = 400.0 / mq135_ratio; // MQ135 CO2 calibration
@@ -115,5 +115,5 @@ void setup() {
 
 void loop() {
   dnsServer.processNextRequest();
-  delay(1000); // Allow sensor stabilization
+  delay(5000); // Allow sensor stabilization
 }
